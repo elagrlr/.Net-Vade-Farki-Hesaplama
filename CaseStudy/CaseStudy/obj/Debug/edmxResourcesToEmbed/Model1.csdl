@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PaymentDbModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+    <Property Name="principal_id" Type="Int32" Nullable="false" />
+    <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="version" Type="Int32" />
+    <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+  </EntityType>
+  <EntityType Name="DenemeTable">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" />
+    <Property Name="InvoiceId" Type="Int32" />
+    <Property Name="AccountNum" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="InvoiceAmount" Type="Double" />
+    <Property Name="DueDate" Type="DateTime" Precision="0" />
+    <Property Name="BuzOpenAmount" Type="Double" />
+    <Property Name="Bank" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="PaymentAmount" Type="Double" />
+    <Property Name="TransDate" Type="DateTime" Precision="0" />
+  </EntityType>
+  <EntityContainer Name="PaymentDbEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" />
+    <EntitySet Name="DenemeTable" EntityType="Self.DenemeTable" />
+    <EntitySet Name="Invoices" EntityType="PaymentDbModel.Invoices" />
+    <EntitySet Name="Payments" EntityType="PaymentDbModel.Payments" />
+    <AssociationSet Name="FK_Payments_Invoices" Association="PaymentDbModel.FK_Payments_Invoices">
+      <End Role="Invoices" EntitySet="Invoices" />
+      <End Role="Payments" EntitySet="Payments" />
+    </AssociationSet>
+    <EntitySet Name="Delays" EntityType="PaymentDbModel.Delays" />
+    <AssociationSet Name="FK_Delay_Invoices" Association="PaymentDbModel.FK_Delay_Invoices">
+      <End Role="Invoices" EntitySet="Invoices" />
+      <End Role="Delays" EntitySet="Delays" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Delay_Payments" Association="PaymentDbModel.FK_Delay_Payments">
+      <End Role="Payments" EntitySet="Payments" />
+      <End Role="Delays" EntitySet="Delays" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Invoices">
+    <Key>
+      <PropertyRef Name="INVOICEID" />
+    </Key>
+    <Property Name="INVOICEID" Type="Int32" Nullable="false" />
+    <Property Name="AccountNum" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="InvoiceAmount" Type="Double" Nullable="false" />
+    <Property Name="DueDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="BuzOpenAmount" Type="Double" Nullable="false" />
+    <NavigationProperty Name="Payments" Relationship="PaymentDbModel.FK_Payments_Invoices" FromRole="Invoices" ToRole="Payments" />
+    <NavigationProperty Name="Delays" Relationship="PaymentDbModel.FK_Delay_Invoices" FromRole="Invoices" ToRole="Delays" />
+  </EntityType>
+  <EntityType Name="Payments">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" />
+    <Property Name="InvoiceId" Type="Int32" Nullable="false" />
+    <Property Name="Bank" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="true" />
+    <Property Name="PaymentAmount" Type="Double" Nullable="false" />
+    <Property Name="AccountNum" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="TransDate" Type="DateTime" Nullable="false" Precision="3" />
+    <NavigationProperty Name="Invoices" Relationship="PaymentDbModel.FK_Payments_Invoices" FromRole="Payments" ToRole="Invoices" />
+    <NavigationProperty Name="Delays" Relationship="PaymentDbModel.FK_Delay_Payments" FromRole="Payments" ToRole="Delays" />
+  </EntityType>
+  <Association Name="FK_Payments_Invoices">
+    <End Type="PaymentDbModel.Invoices" Role="Invoices" Multiplicity="1" />
+    <End Type="PaymentDbModel.Payments" Role="Payments" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Invoices">
+        <PropertyRef Name="INVOICEID" />
+      </Principal>
+      <Dependent Role="Payments">
+        <PropertyRef Name="InvoiceId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Delays">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Int32" Nullable="false" />
+    <Property Name="InvoiceId" Type="Int32" />
+    <Property Name="PaymentId" Type="Int32" />
+    <Property Name="AccountNum" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+    <Property Name="Rate" Type="Double" />
+    <Property Name="DelayAmount" Type="Double" />
+    <NavigationProperty Name="Invoices" Relationship="PaymentDbModel.FK_Delay_Invoices" FromRole="Delays" ToRole="Invoices" />
+    <NavigationProperty Name="Payments" Relationship="PaymentDbModel.FK_Delay_Payments" FromRole="Delays" ToRole="Payments" />
+  </EntityType>
+  <Association Name="FK_Delay_Invoices">
+    <End Type="PaymentDbModel.Invoices" Role="Invoices" Multiplicity="0..1" />
+    <End Type="PaymentDbModel.Delays" Role="Delays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Invoices">
+        <PropertyRef Name="INVOICEID" />
+      </Principal>
+      <Dependent Role="Delays">
+        <PropertyRef Name="InvoiceId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Delay_Payments">
+    <End Type="PaymentDbModel.Payments" Role="Payments" Multiplicity="0..1" />
+    <End Type="PaymentDbModel.Delays" Role="Delays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Payments">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Delays">
+        <PropertyRef Name="PaymentId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema>

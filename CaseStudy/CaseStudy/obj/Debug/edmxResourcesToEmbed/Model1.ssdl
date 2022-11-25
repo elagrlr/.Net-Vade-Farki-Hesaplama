@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="PaymentDbModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="Delays">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="InvoiceId" Type="int" />
+    <Property Name="PaymentId" Type="int" />
+    <Property Name="AccountNum" Type="nvarchar" MaxLength="10" />
+    <Property Name="Rate" Type="float" />
+    <Property Name="DelayAmount" Type="float" />
+  </EntityType>
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'PaymentDb.dbo.DenemeTable' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+  <EntityType Name="DenemeTable">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="InvoiceId" Type="int" />
+    <Property Name="AccountNum" Type="nvarchar" MaxLength="10" />
+    <Property Name="InvoiceAmount" Type="float" />
+    <Property Name="DueDate" Type="date" />
+    <Property Name="BuzOpenAmount" Type="float" />
+    <Property Name="Bank" Type="nvarchar" MaxLength="10" />
+    <Property Name="PaymentAmount" Type="float" />
+    <Property Name="TransDate" Type="date" />
+  </EntityType>
+  <EntityType Name="Invoices">
+    <Key>
+      <PropertyRef Name="INVOICEID" />
+    </Key>
+    <Property Name="INVOICEID" Type="int" Nullable="false" />
+    <Property Name="AccountNum" Type="nvarchar" MaxLength="10" Nullable="false" />
+    <Property Name="InvoiceAmount" Type="float" Nullable="false" />
+    <Property Name="DueDate" Type="datetime" Nullable="false" />
+    <Property Name="BuzOpenAmount" Type="float" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Payments">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" Nullable="false" />
+    <Property Name="InvoiceId" Type="int" Nullable="false" />
+    <Property Name="Bank" Type="nchar" MaxLength="10" Nullable="false" />
+    <Property Name="PaymentAmount" Type="float" Nullable="false" />
+    <Property Name="AccountNum" Type="nvarchar" MaxLength="10" Nullable="false" />
+    <Property Name="TransDate" Type="datetime" Nullable="false" />
+  </EntityType>
+  <EntityType Name="sysdiagrams">
+    <Key>
+      <PropertyRef Name="diagram_id" />
+    </Key>
+    <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+    <Property Name="principal_id" Type="int" Nullable="false" />
+    <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="version" Type="int" />
+    <Property Name="definition" Type="varbinary(max)" />
+  </EntityType>
+  <Association Name="FK_Delay_Invoices">
+    <End Role="Invoices" Type="Self.Invoices" Multiplicity="0..1" />
+    <End Role="Delays" Type="Self.Delays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Invoices">
+        <PropertyRef Name="INVOICEID" />
+      </Principal>
+      <Dependent Role="Delays">
+        <PropertyRef Name="InvoiceId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Delay_Payments">
+    <End Role="Payments" Type="Self.Payments" Multiplicity="0..1" />
+    <End Role="Delays" Type="Self.Delays" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Payments">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Delays">
+        <PropertyRef Name="PaymentId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Payments_Invoices">
+    <End Role="Invoices" Type="Self.Invoices" Multiplicity="1" />
+    <End Role="Payments" Type="Self.Payments" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Invoices">
+        <PropertyRef Name="INVOICEID" />
+      </Principal>
+      <Dependent Role="Payments">
+        <PropertyRef Name="InvoiceId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="PaymentDbModelStoreContainer">
+    <EntitySet Name="Delays" EntityType="Self.Delays" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Invoices" EntityType="Self.Invoices" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Payments" EntityType="Self.Payments" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="DenemeTable" EntityType="Self.DenemeTable" store:Type="Tables" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [DenemeTable].[Id] AS [Id], 
+    [DenemeTable].[InvoiceId] AS [InvoiceId], 
+    [DenemeTable].[AccountNum] AS [AccountNum], 
+    [DenemeTable].[InvoiceAmount] AS [InvoiceAmount], 
+    [DenemeTable].[DueDate] AS [DueDate], 
+    [DenemeTable].[BuzOpenAmount] AS [BuzOpenAmount], 
+    [DenemeTable].[Bank] AS [Bank], 
+    [DenemeTable].[PaymentAmount] AS [PaymentAmount], 
+    [DenemeTable].[TransDate] AS [TransDate]
+    FROM [dbo].[DenemeTable] AS [DenemeTable]</DefiningQuery>
+    </EntitySet>
+    <AssociationSet Name="FK_Delay_Invoices" Association="Self.FK_Delay_Invoices">
+      <End Role="Invoices" EntitySet="Invoices" />
+      <End Role="Delays" EntitySet="Delays" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Delay_Payments" Association="Self.FK_Delay_Payments">
+      <End Role="Payments" EntitySet="Payments" />
+      <End Role="Delays" EntitySet="Delays" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Payments_Invoices" Association="Self.FK_Payments_Invoices">
+      <End Role="Invoices" EntitySet="Invoices" />
+      <End Role="Payments" EntitySet="Payments" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

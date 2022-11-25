@@ -1,0 +1,34 @@
+﻿@model IEnumerable<CaseStudy.Invoices>
+@{
+    ViewBag.Title = "Home Page";
+}
+
+ <html>
+<head></head>
+<body>
+    <table class="table table-bordered table-responsive table-hover" id="table" >
+        <thead>
+            <tr>
+                <th> Id</th>
+                <th>Account Num</th>
+                <th>Invoice Amount</th>
+                <th>DueDate</th>
+                <th>BuzOpenAmount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.INVOICEID</td>
+                    <td>@item.AccountNum</td>
+                    <td>@item.InvoiceAmount</td>
+                    <td>@item.DueDate</td>
+                    <td>@item.BuzOpenAmount</td>
+                    <td> @Html.ActionLink("Details", "Index3", new { id = item.INVOICEID })</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

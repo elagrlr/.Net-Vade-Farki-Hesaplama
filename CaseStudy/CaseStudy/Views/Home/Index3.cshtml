@@ -1,0 +1,124 @@
+﻿@model IEnumerable<CaseStudy.Payments>
+@{
+    ViewBag.Title = "Index3";
+}
+@{
+    var data = (Invoices)ViewData["Message"];
+}
+
+@{ double paid = 0;
+    string result = "";
+    double faizOrani = 0;
+    TimeSpan days;
+    string dayDifference;
+    int numOfDay;
+    double delayAmount = 0;
+
+}
+<h3>Gecikmesiz Ödeme Bilgileri </h3>
+<table class="table table-bordered table-responsive table-hover" id="table">
+    <thead>
+        <tr>
+            <th> Invoice Id</th>
+            <th> Account Number</th>
+            <th>Invoice Amount</th>
+            <th> Payment Amount</th>
+            <th>DueDate</th>
+            <th>TransDate</th>
+
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            //gecikme varmı
+            if (item.TransDate <= item.Invoices.DueDate)
+            {
+                result = "gecikme yok";
+                faizOrani = 0;
+                <tr>
+                    <td>@item.InvoiceId</td>
+                    <td>@item.AccountNum</td>
+                    <td>@item.Invoices.InvoiceAmount</td>
+                    <td>@item.PaymentAmount</td>
+                    <td>@item.Invoices.DueDate.ToShortDateString()</td>
+                    <td>@item.TransDate.ToShortDateString()</td>
+                </tr>
+
+                paid += item.PaymentAmount;
+            }
+            else
+            {
+                result = "gecikme var";
+                days = (item.TransDate - item.Invoices.DueDate);
+                dayDifference = days.Days.ToString();
+                numOfDay = Convert.ToInt32(dayDifference);
+                faizOrani = 0.16 * numOfDay;
+                delayAmount = (item.PaymentAmount) * faizOrani / 100;
+            }
+        }
+    </tbody>
+</table>
+<label> Odenen: @paid</label>
+
+<h3>Gecikme/Faiz Bilgileri </h3>
+<table class="table table-bordered table-responsive table-hover">
+    <thead>
+        <tr>
+            <th> Invoice Id</th>
+            <th> Account Number</th>
+            <th>Invoice Amount</th>
+            <th>Payment Amount</th>
+            <th>Total Payment</th>
+            <th>TransDate</th>
+            <th>DueDate</th>
+            <th>Result</th>
+            <th>Interest Rate</th>
+            <th>Delay Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            if (item.Invoices.InvoiceAmount == paid)
+            {
+                <tr>
+                    <td>@item.InvoiceId</td>
+                    <td>@item.AccountNum</td>
+                    <td>@item.Invoices.InvoiceAmount</td>
+                    <td>@item.PaymentAmount</td>
+                    <td>@paid</td>
+                    <td>@item.TransDate.ToShortDateString()</td>
+                    <td>@item.Invoices.DueDate.ToShortDateString()</td>
+                    <td>@result</td>
+                    <td>@faizOrani</td>
+                    <td>@delayAmount</td>
+                </tr>
+
+
+
+            }
+            else if (item.Invoices.InvoiceAmount != paid && item.Invoices.BuzOpenAmount == 0) // buzOpenAmount=0
+            {
+
+
+                <tr>
+                    <td>@item.InvoiceId</td>
+                    <td>@item.AccountNum</td>
+                    <td>@item.Invoices.InvoiceAmount</td>
+                    <td>@item.PaymentAmount</td>
+                    <td>@paid</td>
+                    <td>@item.TransDate.ToShortDateString()</td>
+                    <td>@item.Invoices.DueDate.ToShortDateString()</td>
+                    <td>@result</td>
+                    <td>@faizOrani</td>
+                    <td>@delayAmount</td>
+                </tr>
+
+            }
+
+        }
+    </tbody>
+</table>
